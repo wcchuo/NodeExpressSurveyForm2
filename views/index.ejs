@@ -1,0 +1,62 @@
+<html>
+<head>
+    <title>Your Comments</title>
+    <link href='style.css' type="text/css" rel="stylesheet" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type ="text/javascript">
+          var message = "";
+          $(document).ready(function (){
+              // this triggers the connection event in our server!
+              var socket = io.connect();
+
+            $('button').click(function (){
+                  socket.emit("posting_form", {
+                    name: $('#name').val(),
+                    location: $('#location').val(),
+                    language: $('#language').val(),
+                    comment: $('#comment').val()
+                  });
+              });
+              socket.on('updated_message', function (data){
+                  console.log('The server says: ' + data.name + ", " + data.location + ", " + data.language + ", " + data.comment);
+                  var message = "You emitted the following information to the server: { name: <b>&ldquo;" + data.name + "</b>&rdquo;, location: <b>&ldquo;" + data.location + "</b>&rdquo;, language: <b>&ldquo;" + data.language + "</b>&rdquo;, comment: <b>&ldquo;" + data.comment + "</b>&rdquo;}";
+                  $( "div#message" ).html( "<div id='response'>"+message+"<p id='randnum'></p></div>" );
+              });
+              socket.on('random_number', function (data){
+                  console.log('Random Number is: ' + data.rand_num);
+                  $( "p#randnum" ).html("Your lucky number emitted by the server is <b>"+data.rand_num+"</b>." );
+
+              });
+          })
+          console.log(message);
+    </script>
+</head>
+<body>
+ <div class="container">
+ <h3>Your Comments</h3>
+   <div id='message'></div>
+  <label>Your Name: </label>
+  <input type='text' id='name' placeholder='Your name'></br>
+   <label>Dojo Location:</label>
+  <select id='location' placeholder='Location'>
+    <option value=''>-- Please select --</option>  
+    <option value='Mountain View'>Mountain View</option>  
+    <option value='Los Angeles'>Los Angeles</option>  
+    <option value='Seattle'>Seattle</option>  
+  </select></br>
+   <label>Favorite Language:</label>
+  <select id='language' placeholder='Language'>
+    <option value=''>-- Please select --</option>  
+    <option value='Javascript'>Javascript</option>  
+    <option value='PHP'>PHP</option>  
+    <option value='Python'>Python</option>  
+    <option value='Rails'>Rails</option>  
+    <option value='C++'>C++</option>  
+  </select></br>
+   <label>Comment (Optional):</label>
+  <textarea id='comment' rows='6' placeholder='Comments'></textarea></br>
+  <button type='submit' value='Submit' class='button pull-right'>Submit</button>
+ </div>
+</body>
+</html>
